@@ -1,0 +1,60 @@
+### GET request to example server
+GET https://examples.http-client.intellij.net/get
+    ?generated-in=IntelliJ IDEA
+
+### Signup a new member
+POST http://localhost:3005/auth/signup
+Content-Type: application/json
+
+{
+  "memberNick": "Ali",
+  "memberPhone": "01058649977",
+  "memberPassword": "1111111"
+}
+
+### Try the same again — should fail with "memberNick already taken"
+POST http://localhost:3005/auth/signup
+Content-Type: application/json
+
+{
+  "memberNick": "Ali",
+  "memberPhone": "01058649977",
+  "memberPassword": "1111111"
+}
+
+### Validation error — empty nick
+POST http://localhost:3005/auth/signup
+Content-Type: application/json
+
+{
+  "memberNick": "",
+  "memberPhone": "+82-10-1111-2222",
+  "memberPassword": "abc"
+}
+
+### 2. Login — capture the token
+# @name login
+POST http://localhost:3005/auth/login
+Content-Type: application/json
+
+{
+  "memberNick": "Sammy",
+  "memberPassword": "1111111"
+}
+
+### 3. Use the token to access protected endpoint
+@login =login
+GET http://localhost:3005/members/me
+Authorization: Bearer {{login.response.body.accessToken}}
+
+### 4. Without token — should fail with 403
+GET http://localhost:3005/members/me
+
+### 5. Wrong password — should fail with 401
+POST http://localhost:3005/auth/login
+Content-Type: application/json
+
+{
+  "memberNick": "azamat",
+  "memberPassword": "WRONG"
+}
